@@ -1,5 +1,6 @@
 import e from 'express'
 import { User, validateUser, validateEmailAndPassword } from '../models/user.js'
+import authorized from '../middleware/auth.js'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 
@@ -57,6 +58,14 @@ userRouter.post('/login', async (req, res) => {
         res.status(401)
         throw new Error('Invalid login details.')
     }
+})
+
+//Purpose: Check a currently logged in user
+//Access: private
+//Route: /api/users/me
+userRouter.get('/me', authorized, (req, res) => {
+    const currentUser = _.pick(req.user, ['id', 'name'])
+    return res.send({ ...currentUser })
 })
 
 export default userRouter

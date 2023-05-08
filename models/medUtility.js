@@ -10,7 +10,6 @@ export const MedUtility = mongoose.model(
         },
         inStock: {
             type: Number,
-            min: 5,
             required: true,
         },
         expDate: {

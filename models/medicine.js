@@ -4,20 +4,25 @@ import Joi from 'joi'
 //Set up a model
 export const Medicine = mongoose.model(
     'Medicine',
-    new mongoose.Schema({
-        name: {
-            type: String,
-            required: true,
+    new mongoose.Schema(
+        {
+            name: {
+                type: String,
+                required: true,
+            },
+            inStock: {
+                type: Number,
+                required: true,
+            },
+            expDate: {
+                type: Date,
+                required: true,
+            },
         },
-        inStock: {
-            type: Number,
-            required: true,
-        },
-        expDate: {
-            type: Date,
-            required: true,
-        },
-    })
+        {
+            timestamps: true,
+        }
+    )
 )
 
 //Validate the user input - client side
