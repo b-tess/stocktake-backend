@@ -44,3 +44,12 @@ export function validateUser(user) {
 
     return schema.validate(user, { abortEarly: false })
 }
+
+export function validateEmailAndPassword(userInfo) {
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required(),
+    })
+
+    return schema.validate(userInfo, { abortEarly: false })
+}

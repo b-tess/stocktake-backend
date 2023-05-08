@@ -1,5 +1,5 @@
 import e from 'express'
-import { User, validateUser } from '../models/user.js'
+import { User, validateUser, validateEmailAndPassword } from '../models/user.js'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 
@@ -35,6 +35,28 @@ userRouter.post('/', async (req, res) => {
     newUser = await newUser.save()
     newUser = _.pick(newUser, ['_id', 'name', 'email'])
     res.status(201).json({ ...newUser })
+})
+
+//Purpose: Login a user
+//Access: public
+//Route: /api/users/login
+userRouter.post('/login', async (req, res) => {
+    const { error } = validateEmailAndPassword(req.body)
+    if (error) {
+        let messages = []
+        error.details.forEach((detail) => messages.push(detail.message))
+        return res.status(400).send(messages.join('\n'))
+    }
+
+    const user = await User.findOne({ email: req.body.email })
+    if (user && (await bcrypt.compare(req.body.password, user.password))) {
+        const token = user.generateAuthToken()
+        const userInfo = _.pick(user, ['_id', 'name'])
+        return res.send({ ...userInfo, token })
+    } else {
+        res.status(401)
+        throw new Error('Invalid login details.')
+    }
 })
 
 export default userRouter
