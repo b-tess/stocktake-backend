@@ -27,6 +27,7 @@ userRouter.post('/', async (req, res) => {
 
     //Add new user to the db
     let newUser = new User(_.pick(req.body, ['name', 'email', 'password']))
+    const token = newUser.generateAuthToken()
     try {
         newUser.password = await bcrypt.hash(newUser.password, 10)
     } catch (error) {
@@ -35,7 +36,7 @@ userRouter.post('/', async (req, res) => {
     }
     newUser = await newUser.save()
     newUser = _.pick(newUser, ['_id', 'name', 'email'])
-    res.status(201).json({ ...newUser })
+    res.status(201).json({ ...newUser, token })
 })
 
 //Purpose: Login a user
