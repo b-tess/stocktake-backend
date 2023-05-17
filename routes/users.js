@@ -53,7 +53,7 @@ userRouter.post('/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email })
     if (user && (await bcrypt.compare(req.body.password, user.password))) {
         const token = user.generateAuthToken()
-        const userInfo = _.pick(user, ['_id', 'name'])
+        const userInfo = _.pick(user, ['_id', 'name', 'isAdmin'])
         return res.send({ ...userInfo, token })
     } else {
         res.status(401)
