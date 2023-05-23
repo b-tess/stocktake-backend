@@ -34,7 +34,8 @@ medicineRouter.post('/', authorized, async (req, res) => {
     if (error) {
         let messages = []
         error.details.forEach((detail) => messages.push(detail.message))
-        return res.status(400).send(messages.join('\n'))
+        res.status(400)
+        throw new Error(messages.join('\n'))
     }
 
     if (req.user && req.user.isAdmin) {

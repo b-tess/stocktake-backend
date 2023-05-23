@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 import Joi from 'joi'
 
+const date = Date.now().toString().split('-', 2).join('-')
+const date1 = new Date().toString()
+
 //Set up a model
 export const Medicine = mongoose.model(
     'Medicine',
@@ -12,10 +15,12 @@ export const Medicine = mongoose.model(
             },
             inStock: {
                 type: Number,
+                min: 1,
                 required: true,
             },
             expDate: {
                 type: Date,
+                min: new Date(),
                 required: true,
             },
         },
@@ -29,8 +34,8 @@ export const Medicine = mongoose.model(
 export function validateMedicine(medicine) {
     const schema = Joi.object({
         name: Joi.string().required(),
-        inStock: Joi.number().required(),
-        expDate: Joi.date().required(),
+        inStock: Joi.number().min(1).required(),
+        expDate: Joi.date().required().min(),
     })
 
     return schema.validate(medicine, { abortEarly: false })
