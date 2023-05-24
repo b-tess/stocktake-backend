@@ -25,6 +25,21 @@ medicineRouter.get('/', async (req, res) => {
     return res.send(medication)
 })
 
+//Purpose: Get one medicine doc
+//Access: not sure yet
+//User: not sure yet
+//Route: /api/medication/:id
+medicineRouter.get('/:id', async (req, res) => {
+    const medication = await Medicine.findById(req.params.id)
+    const upd = `${medication.expDate}Z`
+    // const correct = {
+    //     ...medication,
+    //     upd,
+    // }
+    medication.expDate = upd
+    return res.send(medication)
+})
+
 //Purpose: Add a new medicine item/doc
 //Access: private
 //User: logged in & isAdmin
