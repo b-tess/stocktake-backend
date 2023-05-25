@@ -13,10 +13,10 @@ const medicineRouter = e.Router()
 const ObjectId = mongoose.Types.ObjectId
 
 //Purpose: Get all medicine docs
-//Access: not sure yet
-//User: not sure yet
+//Access: private
+//User: logged in
 //Route: /api/medication
-medicineRouter.get('/', async (req, res) => {
+medicineRouter.get('/', authorized, async (req, res) => {
     const medication = await Medicine.find().sort({ name: 1 })
     if (medication.length === 0) {
         return res.send('No medication in stock yet.')
