@@ -1,8 +1,10 @@
 import e from 'express'
+import mongoose from 'mongoose'
 import { StockItem, validateStockItem } from '../models/stockItem.js'
 import authorized from '../middleware/auth.js'
 import _ from 'lodash'
 
+const ObjectId = mongoose.Types.ObjectId
 const stockItemRouter = e.Router()
 
 //Purpose: Get all stock item docs
@@ -16,6 +18,39 @@ stockItemRouter.get('/', authorized, async (req, res) => {
     }
 
     return res.send(stockItems)
+})
+
+//Purpose: Get one stock item doc
+//Access: private
+//User: logged in and admin
+//Route: /api/stockitems/:id
+stockItemRouter.get('/:id', authorized, async (req, res) => {
+    if (req.user && req.user.isAdmin) {
+        if (ObjectId.isValid(req.params.id)) {
+            const stockItem = await StockItem.findById(req.params.id)
+
+            if (!stockItem) {
+                res.status(404)
+                throw new Error('Stock item not found.')
+            }
+
+            return res.send(
+                _.pick(stockItem, [
+                    '_id',
+                    'name',
+                    'inStock',
+                    'expDate',
+                    'itemType',
+                ])
+            )
+        } else {
+            res.status(400)
+            throw new Error('Invalid id.')
+        }
+    } else {
+        res.status(401)
+        throw new Error('Not authorized.')
+    }
 })
 
 //Purpose: Add a new stock item/doc
