@@ -78,4 +78,33 @@ stockItemRouter.post('/', authorized, async (req, res) => {
     }
 })
 
+//Purpose: Edit one medicine doc inStock & exp date ONLY for received stock
+//Access: private
+//User: logged in & isAdmin
+//Route: /api/medication/:id
+stockItemRouter.put('/:id', authorized, async (req, res) => {
+    if (req.user && req.user.isAdmin) {
+        if (ObjectId.isValid(req.params.id)) {
+            const adminUpdItemDoc = await StockItem.findByIdAndUpdate(
+                req.params.id,
+                req.body,
+                { new: true }
+            )
+
+            if (!adminUpdItemDoc) {
+                res.status(404)
+                throw new Error('Document not found')
+            }
+
+            return res.send(adminUpdItemDoc)
+        } else {
+            res.status(400)
+            throw new Error('Invalid id.')
+        }
+    } else {
+        res.status(401)
+        throw new Error('Not Authorized.')
+    }
+})
+
 export default stockItemRouter
