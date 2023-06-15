@@ -81,7 +81,7 @@ stockItemRouter.post('/', authorized, async (req, res) => {
 //Purpose: Edit one medicine doc inStock & exp date ONLY for received stock
 //Access: private
 //User: logged in & isAdmin
-//Route: /api/medication/:id
+//Route: /api/stockitems/:id
 stockItemRouter.put('/:id', authorized, async (req, res) => {
     if (req.user && req.user.isAdmin) {
         if (ObjectId.isValid(req.params.id)) {
@@ -97,6 +97,33 @@ stockItemRouter.put('/:id', authorized, async (req, res) => {
             }
 
             return res.send(adminUpdItemDoc)
+        } else {
+            res.status(400)
+            throw new Error('Invalid id.')
+        }
+    } else {
+        res.status(401)
+        throw new Error('Not Authorized.')
+    }
+})
+
+//Purpose: Delete a stock item doc
+//Access: private
+//User: logged in & admin
+//Route: /api/stockitems/:id
+stockItemRouter.delete('/:id', authorized, async (req, res) => {
+    if (req.user && req.user.isAdmin) {
+        if (ObjectId.isValid(req.params.id)) {
+            const deletedItemDoc = await StockItem.findOneAndDelete({
+                _id: req.params.id,
+            })
+
+            if (!deletedItemDoc) {
+                res.status(404)
+                throw new Error('Document not found')
+            }
+
+            return res.send(deletedItemDoc)
         } else {
             res.status(400)
             throw new Error('Invalid id.')
