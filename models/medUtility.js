@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
+import mongoosePaginate from 'mongoose-paginate-v2'
 import Joi from 'joi'
 
-export const MedUtility = mongoose.model(
-    'MedUtility',
-    new mongoose.Schema({
+//Med utility schema
+const medUtilitySchema = new mongoose.Schema(
+    {
         name: {
             type: String,
             required: true,
@@ -15,8 +16,15 @@ export const MedUtility = mongoose.model(
         expDate: {
             type: Date,
         },
-    })
+    },
+    {
+        timestamps: true,
+    }
 )
+
+medUtilitySchema.plugin(mongoosePaginate)
+
+export const MedUtility = mongoose.model('MedUtility', medUtilitySchema)
 
 export function validateUtility(medUtility) {
     const schema = Joi.object({
