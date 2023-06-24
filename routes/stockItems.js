@@ -11,13 +11,22 @@ const stockItemRouter = e.Router()
 //Access: private
 //User: logged in
 //Route: /api/stockitems
-stockItemRouter.get('/', authorized, async (req, res) => {
-    const stockItems = await StockItem.find().sort({ name: 1 })
+stockItemRouter.get('/pg/:page', authorized, async (req, res) => {
+    const limit = 10
+    const { page } = parseInt(req.params.page)
+    const stockItems = await StockItem.find()
+        .sort({ name: 1 })
+        .limit(limit)
+        .skip((page - 1) * limit)
+
+    const count = await StockItem.countDocuments()
+    const totalPages = Math.ceil(count / limit)
+
     if (stockItems.length === 0) {
         return res.send('Nothing in stock yet.')
     }
 
-    return res.send(stockItems)
+    return res.json({ stockItems, totalPages })
 })
 
 //Purpose: Get one stock item doc
