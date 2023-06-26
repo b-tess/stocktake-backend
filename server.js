@@ -7,6 +7,7 @@ import homeRouter from './routes/home.js'
 import userRouter from './routes/users.js'
 import medicineRouter from './routes/medication.js'
 import stockItemRouter from './routes/stockItems.js'
+import singleStockItemRouter from './routes/stockItem.js'
 import utilityRouter from './routes/medUtilities.js'
 import errorLog from './middleware/errorLog.js'
 
@@ -22,6 +23,7 @@ app.use('/', homeRouter)
 app.use('/api/users', userRouter)
 app.use('/api/medication', medicineRouter)
 app.use('/api/stockitems', stockItemRouter)
+app.use('/api/stockitem', singleStockItemRouter)
 app.use('/api/utilities', utilityRouter)
 app.use(errorLog)
 
