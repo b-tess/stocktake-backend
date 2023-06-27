@@ -30,7 +30,7 @@ const stockItemSchema = new mongoose.Schema(
     }
 )
 
-// stockItemSchema.plugin(mongoosePaginate)
+stockItemSchema.plugin(mongoosePaginate)
 
 //Set up a model
 export const StockItem = mongoose.model('StockItem', stockItemSchema)

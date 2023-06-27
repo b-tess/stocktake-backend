@@ -5,6 +5,7 @@ import authorized from '../middleware/auth.js'
 import _ from 'lodash'
 
 const singleStockItemRouter = e.Router()
+const ObjectId = mongoose.Types.ObjectId
 
 //Purpose: Get one stock item doc
 //Access: private

@@ -3,13 +3,12 @@ import { MedUtility } from '../models/medUtility.js'
 
 const utilityRouter = e.Router()
 
-const options = {
-    page: 2,
-    limit: 5,
-    sort: { name: -1 },
-}
-
 utilityRouter.get('/', async (req, res) => {
+    const options = {
+        page: req.query.page,
+        limit: 5,
+        sort: { name: -1 },
+    }
     const result = await MedUtility.paginate({}, options)
 
     const utilityItems = result.docs
