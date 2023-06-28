@@ -46,3 +46,13 @@ export function validateStockItem(stockItem) {
 
     return schema.validate(stockItem, { abortEarly: false })
 }
+
+//Validate the user input for removing stock - client side
+export function validateStockEdit(count) {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        count: Joi.number().required(),
+    })
+
+    return schema.validate(count, { abortEarly: false })
+}

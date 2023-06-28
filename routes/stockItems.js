@@ -1,5 +1,9 @@
 import e from 'express'
-import { StockItem, validateStockItem } from '../models/stockItem.js'
+import {
+    StockItem,
+    validateStockItem,
+    validateStockEdit,
+} from '../models/stockItem.js'
 import authorized from '../middleware/auth.js'
 import _ from 'lodash'
 
@@ -49,6 +53,42 @@ stockItemRouter.post('/', authorized, async (req, res) => {
         )
         newStockItem = await newStockItem.save()
         return res.send(newStockItem)
+    } else {
+        res.status(401)
+        throw new Error('Not Authorized.')
+    }
+})
+
+//Purpose: Edit one medicine doc stock ONLY
+//Access: private
+//User: logged in
+//Route: /api/stockitems/stockout
+stockItemRouter.put('/stockout', authorized, async (req, res) => {
+    const { error } = validateStockEdit(req.body)
+    if (error) {
+        let messages = []
+        error.details.forEach((detail) => messages.push(detail.message))
+        return res.status(400).send(messages.join('\n'))
+    }
+
+    if (req.user) {
+        if (ObjectId.isValid(req.body.id)) {
+            const updatedMedicineDoc = await Medicine.findByIdAndUpdate(
+                req.body.id,
+                { $inc: { inStock: -req.body.count } },
+                { new: true }
+            )
+
+            if (!updatedMedicineDoc) {
+                res.status(404)
+                throw new Error('Document not found')
+            }
+
+            return res.send(updatedMedicineDoc)
+        } else {
+            res.status(400)
+            throw new Error('Invalid id.')
+        }
     } else {
         res.status(401)
         throw new Error('Not Authorized.')
