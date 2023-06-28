@@ -9,9 +9,9 @@ import _ from 'lodash'
 
 const stockItemRouter = e.Router()
 
-//Purpose: Get all stock item docs
+//Purpose: Get all stock item docs for admin purposes
 //Access: private
-//User: logged in
+//User: logged in & isAdmin
 //Route: /api/stockitems
 stockItemRouter.get('/', authorized, async (req, res) => {
     const options = {
@@ -56,6 +56,30 @@ stockItemRouter.post('/', authorized, async (req, res) => {
     } else {
         res.status(401)
         throw new Error('Not Authorized.')
+    }
+})
+
+//Purpose: Get all stock item docs for stockout purposes
+//Access: private
+//User: logged in
+//Route: /api/stockitems/stockout
+stockItemRouter.get('/stockout', authorized, async (req, res) => {
+    if (req.user) {
+        const options = {
+            page: req.query.page,
+            limit: 5,
+            sort: { name: -1 },
+        }
+
+        const result = await StockItem.paginate({}, options)
+        const stockItems = result.docs
+        const totalPages = result.totalPages
+
+        if (stockItems.length === 0) {
+            return res.send('Nothing in stock yet.')
+        }
+
+        return res.json({ stockItems, totalPages })
     }
 })
 
