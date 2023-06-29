@@ -1,4 +1,5 @@
 import e from 'express'
+import mongoose from 'mongoose'
 import {
     StockItem,
     validateStockItem,
@@ -8,6 +9,7 @@ import authorized from '../middleware/auth.js'
 import _ from 'lodash'
 
 const stockItemRouter = e.Router()
+const ObjectId = mongoose.Types.ObjectId
 
 //Purpose: Get all stock item docs for admin purposes
 //Access: private
@@ -97,18 +99,18 @@ stockItemRouter.put('/stockout', authorized, async (req, res) => {
 
     if (req.user) {
         if (ObjectId.isValid(req.body.id)) {
-            const updatedMedicineDoc = await Medicine.findByIdAndUpdate(
+            const updOnStockOutDoc = await StockItem.findByIdAndUpdate(
                 req.body.id,
                 { $inc: { inStock: -req.body.count } },
                 { new: true }
             )
 
-            if (!updatedMedicineDoc) {
+            if (!updOnStockOutDoc) {
                 res.status(404)
                 throw new Error('Document not found')
             }
 
-            return res.send(updatedMedicineDoc)
+            return res.send(updOnStockOutDoc)
         } else {
             res.status(400)
             throw new Error('Invalid id.')
