@@ -1,8 +1,10 @@
 import e from 'express'
 import { User, validateUser, validateEmailAndPassword } from '../models/user.js'
+import Emailtoken from '../models/token.js'
 import authorized from '../middleware/auth.js'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
+import randomstring from 'randomstring'
 
 const userRouter = e.Router()
 
@@ -35,6 +37,19 @@ userRouter.post('/', async (req, res) => {
         return
     }
     newUser = await newUser.save()
+
+    //Create a unique token for every new user
+    //This token will be deleted later
+    let newUserToken = new Emailtoken({
+        userId: newUser._id,
+        uniqueToken: randomstring.generate({
+            length: 16,
+            charset: 'alphanumeric',
+        }),
+    })
+
+    newUserToken = await newUserToken.save()
+
     newUser = _.pick(newUser, ['_id', 'name', 'email'])
     res.status(201).json({ ...newUser, token })
 })
