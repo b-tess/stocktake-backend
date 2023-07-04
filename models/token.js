@@ -12,6 +12,6 @@ const emailTokenSchema = new mongoose.Schema({
     },
 })
 
-const Emailtoken = mongoose.model('Token', emailTokenSchema)
+const EmailToken = mongoose.model('Token', emailTokenSchema)
 
-export default Emailtoken
+export default EmailToken

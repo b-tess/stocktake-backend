@@ -1,6 +1,7 @@
 import e from 'express'
 import { User, validateUser, validateEmailAndPassword } from '../models/user.js'
-import Emailtoken from '../models/token.js'
+import EmailToken from '../models/token.js'
+import verifyEmail from '../utilities/utils.js'
 import authorized from '../middleware/auth.js'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
@@ -12,6 +13,7 @@ const userRouter = e.Router()
 //Access: public
 //Route: /api/users
 userRouter.post('/', async (req, res) => {
+    let emailSent = null
     //Validate user input
     const { error } = validateUser(req.body)
     if (error) {
@@ -40,7 +42,7 @@ userRouter.post('/', async (req, res) => {
 
     //Create a unique token for every new user
     //This token will be deleted later
-    let newUserToken = new Emailtoken({
+    let newUserToken = new EmailToken({
         userId: newUser._id,
         uniqueToken: randomstring.generate({
             length: 16,
@@ -50,8 +52,38 @@ userRouter.post('/', async (req, res) => {
 
     newUserToken = await newUserToken.save()
 
-    newUser = _.pick(newUser, ['_id', 'name', 'email'])
-    res.status(201).json({ ...newUser, token })
+    const link = `http://localhost:5050/api/users/verifyemail/${newUserToken.uniqueToken}`
+    emailSent = await verifyEmail(newUser.email, link)
+
+    if (emailSent) {
+        const message = 'Email sent. Please check your email.'
+        newUser = _.pick(newUser, ['_id', 'name', 'email'])
+        res.status(201).json({ ...newUser, token, message })
+    } else {
+        res.status(400).send('Email not sent.')
+    }
+})
+
+//Purpose: Verify a user's email
+//Access: private-Only accessible after user clicks link in email
+//Route: /api/users/verifyemail/:newusertoken
+userRouter.get('/verifyemail/:newusertoken', async (req, res) => {
+    //Get the randomly generated token from the params
+    const newUserToken = req.params.newusertoken
+
+    //Find the emailtokens collection doc with the correct token value
+    const newUserDoc = await EmailToken.findOne({ uniqueToken: newUserToken })
+
+    //Update the isVerified value of the correct user doc
+    const user = await User.findByIdAndUpdate(
+        newUserDoc.userId,
+        { isVerified: true },
+        { new: true }
+    )
+    res.status(200).send(user)
+
+    //Delete the emailtoken doc to keep the emailtokens collection empty
+    await EmailToken.findByIdAndDelete(newUserDoc._id)
 })
 
 //Purpose: Login a user
@@ -66,10 +98,23 @@ userRouter.post('/login', async (req, res) => {
     }
 
     const user = await User.findOne({ email: req.body.email })
-    if (user && (await bcrypt.compare(req.body.password, user.password))) {
-        const token = user.generateAuthToken()
-        const userInfo = _.pick(user, ['_id', 'name', 'isAdmin'])
-        return res.send({ ...userInfo, token })
+    //Check if a user doc exists
+    if (user) {
+        //Check if a user has hit the verification endpoint above
+        if (user.isVerified) {
+            //Check if the user passwords match after login attempt
+            if (await bcrypt.compare(req.body.password, user.password)) {
+                const token = user.generateAuthToken()
+                const userInfo = _.pick(user, ['_id', 'name', 'isAdmin'])
+                return res.send({ ...userInfo, token })
+            } else {
+                res.status(401)
+                throw new Error('Invalid login details.')
+            }
+        } else {
+            res.status(400)
+            throw new Error('Please check your email and verify.')
+        }
     } else {
         res.status(401)
         throw new Error('Invalid login details.')

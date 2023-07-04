@@ -21,8 +21,9 @@ async function verifyEmail(userEmail, link) {
             from: 'barbaratessn@gmail.com',
             to: `${userEmail}`,
             subject: 'StocktakeApp Verification Email',
-            text: `Hello. Welcome to the StocktakeApp`,
+            text: ``,
             html: `
+            <p>Hello. Welcome to the StocktakeApp</p>
             <div>
                 <a href=${link}>Activate your account here</a>
             </div>`,
@@ -30,7 +31,11 @@ async function verifyEmail(userEmail, link) {
 
         await transporter.sendMail(mailOptions)
         console.log('Email sent successfully.')
+        return true
     } catch (error) {
         console.log('Message not sent.' + error)
+        return false
     }
 }
+
+export default verifyEmail
