@@ -52,8 +52,8 @@ userRouter.post('/', async (req, res) => {
 
     newUserToken = await newUserToken.save()
 
-    const link = `http://localhost:5050/api/users/verifyemail/${newUserToken.uniqueToken}`
-    emailSent = await verifyEmail(newUser.email, link)
+    const link = `${process.env.BASE_URL}/verifyemail/${newUserToken.uniqueToken}`
+    emailSent = await verifyEmail(newUser.email, newUser.name, link)
 
     if (emailSent) {
         const message = 'Email sent. Please check your email.'
@@ -72,7 +72,9 @@ userRouter.get('/verifyemail/:newusertoken', async (req, res) => {
     const newUserToken = req.params.newusertoken
 
     //Find the emailtokens collection doc with the correct token value
-    const newUserDoc = await EmailToken.findOne({ uniqueToken: newUserToken })
+    const newUserDoc = await EmailToken.findOne({
+        uniqueToken: newUserToken,
+    })
 
     //Update the isVerified value of the correct user doc
     const user = await User.findByIdAndUpdate(

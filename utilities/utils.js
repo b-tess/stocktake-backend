@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 //Create the email sending functionality
-async function verifyEmail(userEmail, link) {
+async function verifyEmail(userEmail, userName, link) {
     try {
         //A transporter contains all the necessary sender info
         const transporter = nodemailer.createTransport({
@@ -23,7 +23,7 @@ async function verifyEmail(userEmail, link) {
             subject: 'StocktakeApp Verification Email',
             text: ``,
             html: `
-            <p>Hello. Welcome to the StocktakeApp</p>
+            <p>Hello ${userName}. Welcome to the StocktakeApp</p>
             <div>
                 <a href=${link}>Activate your account here</a>
             </div>`,
