@@ -64,7 +64,7 @@ stockItemRouter.post('/', authorized, async (req, res) => {
 //Purpose: Get all stock item docs for stockout purposes
 //Access: private
 //User: logged in
-//Route: /api/stockitems/stockout
+//Route: /api/stockitems/stockout?page=pagenumber
 stockItemRouter.get('/stockout', authorized, async (req, res) => {
     if (req.user) {
         const options = {
@@ -85,7 +85,33 @@ stockItemRouter.get('/stockout', authorized, async (req, res) => {
     }
 })
 
-//Purpose: Edit one medicine doc stock ONLY
+//Purpose: Get all stock item docs filtered by type for stockout purposes
+//Access: private
+//User: logged in
+//Route: /api/stockitems/medication?page=pagenumber
+stockItemRouter.get('/medication', authorized, async (req, res) => {
+    if (req.user) {
+        const options = {
+            page: req.query.page,
+            limit: 5,
+            sort: { name: -1 },
+        }
+
+        const query = { itemType: 'Medication' }
+
+        const result = await StockItem.paginate(query, options)
+        const stockItems = result.docs
+        const totalPages = result.totalPages
+
+        if (stockItems.length === 0) {
+            return res.send('Nothing in stock yet.')
+        }
+
+        return res.json({ stockItems, totalPages })
+    }
+})
+
+//Purpose: Edit one stockitem doc stock ONLY
 //Access: private
 //User: logged in
 //Route: /api/stockitems/stockout
