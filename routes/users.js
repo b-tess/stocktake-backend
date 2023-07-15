@@ -77,8 +77,9 @@ userRouter.get('/verifyemail/:newusertoken', async (req, res) => {
     })
 
     //Update the isVerified value of the correct user doc
+    const verifiedUserId = newUserDoc.userId
     const user = await User.findByIdAndUpdate(
-        newUserDoc.userId,
+        verifiedUserId,
         { isVerified: true },
         { new: true }
     )
