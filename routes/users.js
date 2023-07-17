@@ -77,16 +77,18 @@ userRouter.get('/verifyemail/:newusertoken', async (req, res) => {
     })
 
     //Update the isVerified value of the correct user doc
-    const verifiedUserId = newUserDoc.userId
     const user = await User.findByIdAndUpdate(
-        verifiedUserId,
+        newUserDoc.userId,
         { isVerified: true },
         { new: true }
     )
     res.status(200).send(user)
 
-    //Delete the emailtoken doc to keep the emailtokens collection empty
-    await EmailToken.findByIdAndDelete(newUserDoc._id)
+    //Delete the emailtoken doc to keep the emailtokens collection empty.
+    // await EmailToken.findByIdAndDelete(newUserDoc._id)
+    // setTimeout(() => {
+
+    // }, 5000);
 })
 
 //Purpose: Login a user
