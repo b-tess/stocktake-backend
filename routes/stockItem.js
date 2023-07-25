@@ -43,7 +43,7 @@ singleStockItemRouter.get('/:id', authorized, async (req, res) => {
 //Purpose: Edit one medicine doc inStock & exp date ONLY for received stock
 //Access: private
 //User: logged in & isAdmin
-//Route: /api/stockitems/:id
+//Route: /api/stockitem/:id
 singleStockItemRouter.put('/:id', authorized, async (req, res) => {
     if (req.user && req.user.isAdmin) {
         if (ObjectId.isValid(req.params.id)) {
@@ -79,7 +79,7 @@ singleStockItemRouter.put('/:id', authorized, async (req, res) => {
 //Purpose: Delete a stock item doc
 //Access: private
 //User: logged in & admin
-//Route: /api/stockitems/:id
+//Route: /api/stockitem/:id
 singleStockItemRouter.delete('/:id', authorized, async (req, res) => {
     if (req.user && req.user.isAdmin) {
         if (ObjectId.isValid(req.params.id)) {

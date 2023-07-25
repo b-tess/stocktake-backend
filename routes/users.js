@@ -85,10 +85,13 @@ userRouter.get('/verifyemail/:newusertoken', async (req, res) => {
     res.status(200).send(user)
 
     //Delete the emailtoken doc to keep the emailtokens collection empty.
-    // await EmailToken.findByIdAndDelete(newUserDoc._id)
-    // setTimeout(() => {
+    //This brings an issue because in production, requests are made twice by the strict mode setting.
+    //The emmailtoken is created for the user then deleted in the first request.
+    //By the time the 2nd request is made, the user doc required to personalize the page can no longer
+    //be found.
+    //I can maybe check if it will work in production when only one request is made to the db...
 
-    // }, 5000);
+    // await EmailToken.findByIdAndDelete(newUserDoc._id)
 })
 
 //Purpose: Login a user
