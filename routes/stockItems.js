@@ -50,10 +50,50 @@ stockItemRouter.post('/', authorized, async (req, res) => {
     }
 
     if (req.user && req.user.isAdmin) {
+        //Check if the newly created item is present in the db
+        //despite the case of the words provided by the user
+        //if present, do not create a new item
+        const providedName = req.body.name
+            .split(' ')
+            .map(
+                (word) =>
+                    word[0].toUpperCase() + word.substring(1).toLowerCase()
+            )
+            .join(' ')
+
+        const itemExists = await StockItem.findOne({
+            name: providedName,
+        })
+
+        if (itemExists) {
+            throw new Error('This item already exists.')
+        }
+
         let newStockItem = new StockItem(
             _.pick(req.body, ['name', 'inStock', 'expDate', 'itemType'])
         )
         newStockItem = await newStockItem.save()
+
+        //Standardize the case format of the names stored in the db
+        //after they are provided by the user
+        const updName = newStockItem.name
+            .split(' ')
+            .map(
+                (word) =>
+                    word[0].toUpperCase() + word.substring(1).toLowerCase()
+            ) //Capitalize the 1st letter of every word followed by small caps letters
+            .join(' ')
+
+        const update = {
+            name: updName,
+        }
+        newStockItem = await StockItem.findByIdAndUpdate(
+            newStockItem._id,
+            update,
+            {
+                new: true,
+            }
+        )
         return res.send(newStockItem)
     } else {
         res.status(401)
