@@ -193,6 +193,12 @@ stockItemRouter.put('/stockout', authorized, async (req, res) => {
 
     if (req.user) {
         if (ObjectId.isValid(req.body.id)) {
+            const numberInStockCheck = await StockItem.findById(req.body.id)
+            if (req.body.count > numberInStockCheck.inStock) {
+                throw new Error(
+                    'You cannot dispense more that what is in stock.'
+                )
+            }
             const updOnStockOutDoc = await StockItem.findByIdAndUpdate(
                 req.body.id,
                 { $inc: { inStock: -req.body.count } },
