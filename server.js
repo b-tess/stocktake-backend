@@ -22,7 +22,7 @@ const app = e()
 app.use(e.json())
 app.use(
     cors({
-        origin: 'http://localhost:3000',
+        origin: 'https://stocktake-app.onrender.com',
         methods: 'GET',
         allowedHeaders: [
             'Content-Type',
