@@ -14,6 +14,7 @@ const userRouter = e.Router()
 //Route: /api/users
 userRouter.post('/', async (req, res) => {
     let emailSent = null
+    let link
     //Validate user input
     const { error } = validateUser(req.body)
     if (error) {
@@ -52,7 +53,15 @@ userRouter.post('/', async (req, res) => {
 
     newUserToken = await newUserToken.save()
 
-    const link = `${process.env.BASE_URL}/verifyemail/${newUserToken.uniqueToken}`
+    //Change the value of link depending on the environment of the application
+    if (process.env.NODE_ENV === 'production') {
+        //Direct a user to https://stocktake-app.onrender.com/verifyemail/token to verify their email
+        link = `${process.env.BACKEND_URL}/verifyemail/${newUserToken.uniqueToken}`
+    } else {
+        //Direct a user to http://localhost:3000/verifyemail/token to verify their email
+        link = `${process.env.BASE_URL}/verifyemail/${newUserToken.uniqueToken}`
+    }
+
     emailSent = await verifyEmail(newUser.email, newUser.name, link)
 
     if (emailSent) {

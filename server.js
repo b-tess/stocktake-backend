@@ -1,3 +1,4 @@
+import path from 'path'
 import e from 'express'
 import 'express-async-errors'
 import * as dotenv from 'dotenv'
@@ -22,7 +23,7 @@ const app = e()
 app.use(e.json())
 app.use(
     cors({
-        origin: 'https://stocktake-app.onrender.com',
+        origin: ['http://localhost:3000', 'https://stocktake-app.onrender.com'],
         methods: 'GET',
         allowedHeaders: [
             'Content-Type',
@@ -37,12 +38,26 @@ app.use(
         credentials: true,
     })
 )
-app.use('/', homeRouter)
+
 app.use('/api/users', userRouter)
 app.use('/api/medication', medicineRouter)
 app.use('/api/stockitems', stockItemRouter)
 app.use('/api/stockitem', singleStockItemRouter)
 app.use('/api/utilities', utilityRouter)
+
+//Serve the frontend index.html file in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(e.static(path.join(__dirname, '../frontend/build')))
+
+    app.get('*', (req, res) => {
+        res.sendFile(
+            path.join(__dirname, '../', 'frontend', 'build', 'index.html')
+        )
+    })
+} else {
+    app.use('/', homeRouter)
+}
+
 app.use(errorLog)
 
 app.listen(PORT, () => {
