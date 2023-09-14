@@ -1,9 +1,9 @@
 import e from 'express'
 import 'express-async-errors'
-import path from 'path'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import * as dotenv from 'dotenv'
+// import path from 'path'
+// import { dirname } from 'path'
+// import { fileURLToPath } from 'url'
+// import * as dotenv from 'dotenv'
 dotenv.config()
 import dbConnect from './connection/dbConnect.js'
 import cors from 'cors'
@@ -16,7 +16,7 @@ import utilityRouter from './routes/medUtilities.js'
 import errorLog from './middleware/errorLog.js'
 
 const PORT = process.env.PORT || 3000
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// const __dirname = dirname(fileURLToPath(import.meta.url))
 
 //Connect to the db
 dbConnect()
@@ -42,6 +42,7 @@ app.use(
     })
 )
 
+app.use('/', homeRouter)
 app.use('/api/users', userRouter)
 app.use('/api/medication', medicineRouter)
 app.use('/api/stockitems', stockItemRouter)
@@ -49,16 +50,16 @@ app.use('/api/stockitem', singleStockItemRouter)
 app.use('/api/utilities', utilityRouter)
 
 //Serve the frontend index.html file in production
-if (process.env.NODE_ENV === 'production') {
-    //Set the build folder in the front end as a static resource in prod
-    app.use(e.static(path.join(__dirname, '../stocktake-frontend/build')))
+// if (process.env.NODE_ENV === 'production') {
+//     //Set the build folder in the front end as a static resource in prod
+//     app.use(e.static(path.join(__dirname, '../stocktake-frontend/build')))
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../', 'stocktake-frontend', 'build', 'index.html'))
-    })
-} else {
-    app.use('/', homeRouter)
-}
+//     app.get('*', (req, res) => {
+//         res.sendFile(path.join(__dirname, '../', 'stocktake-frontend', 'build', 'index.html'))
+//     })
+// } else {
+//     app.use('/', homeRouter)
+// }
 
 app.use(errorLog)
 
