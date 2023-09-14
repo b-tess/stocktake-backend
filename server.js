@@ -3,7 +3,7 @@ import 'express-async-errors'
 // import path from 'path'
 // import { dirname } from 'path'
 // import { fileURLToPath } from 'url'
-// import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 dotenv.config()
 import dbConnect from './connection/dbConnect.js'
 import cors from 'cors'
